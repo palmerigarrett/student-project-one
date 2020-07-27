@@ -1,0 +1,57 @@
+html {
+   font-size: 100%;
+}
+body {
+   background: #7ac4f8;
+   font-family: 'Open Sans', cursive;
+}
+/* super basic grid structure */
+.container {
+   width: 600px;
+   margin: 0 auto;
+   background: #ffffff;
+   padding: 20px 0;
+   -webkit-box-shadow: 0 0 2px rgba(0,0,0,0.2);
+         box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+/* logo */
+h1 {
+   font-family: 'Open Sans', cursive;
+   color: black;
+   text-align: center;
+   font-weight: 400;
+   margin: 0;
+   background: red;
+   margin-bottom: ;
+}
+
+.todoSubtitle {
+   display: none;
+}
+
+.todoItem {
+   text-align: center;
+   outline-style: solid;
+   box-shadow: 5px 10px 18px black;
+}
+
+.col {
+   text-align: center;
+}
+
+h2 {
+   text-align: center;
+}
+
+.row {
+   text-align: center;
+}
+
+#expandAllButton {
+   text-align: right;
+}
+
+.progress {
+   background-color: #7ac4f8;
+   border: solid
+}

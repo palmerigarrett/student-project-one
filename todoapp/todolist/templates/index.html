@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html >
+<head>
+<meta charset="UTF-8">
+<title>Django Todo App</title>
+{% load static %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div django-app="todoApp">      
+        <div class="container-fluid">
+            <div class="content">
+                <h1>My TodoApp</h1>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <form action="" method="post"> <!-- this form will send a post request to our django app -->
+                            {% csrf_token %} <!-- csrf token for basic security -->
+                                <h2>Add a ToDo</h2>
+                                <div>
+                                    <input type="text" id="description" placeholder="What do you need to do?" name="description" required> <!-- the "required" flag means that the form needs this input to be submitted -->
+                                    <label for="description">Description</label>
+                                </div>
+                                <div>
+                                    <i class="fa fa-caret-down selectArrow"></i>
+                                    <select id="category" name="category_select" required> <!-- when submitting a new todo, this field would be named "category_select"  within the POST request -->
+                                        <option class="disabled" value="">Choose a category</option>
+                                        {% for category in categories %}
+                                            <option class="" value="{{ category.name }}" name="{{ category.name }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="category" required>Category</label>
+                                </div>
+                                <div>
+                                        <input type="date" id="dueDate" class="todoDate" name="date" required>
+                                        <label for="dueDate">Due Date</label>
+                                </div>
+                                <div>
+                                    <button name="todoAdd" type="submit"> <!-- when you hit this button the form will be submitted and the request will be of the type "todoAdd", due to the button's "name" -->
+                                        <i class="fa fa-plus icon"></i>Add Todo
+                                    </button>
+                                </div>
+                        </form>
+                    </div>
+                    <div class="col">
+                        <form action="" method="post"> <!-- this form will send a post request to our django app -->
+                            {% csrf_token %} <!-- csrf token for basic security -->
+                                <h2>Add a Category</h2>
+                                <label for="addCategpry">Category </label>
+                                <input type="text" id="addCategory" placeholder="Add a Category Here!" name="addCategory" required>
+                                <div>
+                                    <button name="categoryAdd" type="submit">
+                                        <i class="fa fa-plus icon"></i>Add Category
+                                    </button>
+                                </div>
+                        </form>
+                    </div>
+                    <div class="col">
+                        <form action="" method="post"> <!-- this form will send a post request to our django app -->
+                            {% csrf_token %} <!-- csrf token for basic security -->
+                            <h2>Categories</h2>
+                            <ul class="catList">
+                                {% for category in categories %}
+                                    <div class="catItem">
+                                        <label for="{{ category.id }}"><span>{{ category.name }}</span></label>
+                                        <button name="categoryDelete" value = "{{ category.id }}" ormnovalidate="" type="submit">
+                                            <i class="fa fa-trash-o icon"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+                <br><br>
+
+                <!-- Progress Bar Color -->
+                {% if currentProgress < 25 %}
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped bg-warning progress-bar-animated" role="progressbar" aria-valuenow="{{ currentProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ currentProgress }}%">{{ currentProgress }}%</div>
+                    </div>
+                {% endif %}
+
+                {% if currentProgress >= 25 and currentProgress <= 75 %}
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar" aria-valuenow="{{ currentProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ currentProgress }}%">{{ currentProgress }}%</div>
+                    </div>
+                {% endif %}
+
+                {% if currentProgress > 75 %}
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" aria-valuenow="{{ currentProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ currentProgress }}%">{{ currentProgress }}%</div>
+                    </div>
+                {% endif %}
+                <br>
+                <div id="expandAllButton">
+                    <label for="expandAll"><span>Expand All</span></label>
+                    <button class="expandAll" type="button">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <form action="" method="post"> <!-- this form will send a post request to our django app -->
+                    {% csrf_token %} <!-- csrf token for basic security -->
+                    <div class="row">
+                        <div class="col-sm">
+                            <h2>Not Started</h2>
+                            <ul class="todoList">
+                                {% for todo in notStarted %} <!-- django template lang - for loop -->
+                                    <div class="todoItem">            
+                                        <label for="{{ todo.id }}"><span><strong>Title: </strong>{{ todo.title }}</span></label>
+                                        <button id="{{ todo.id }}" type="button" class="expandButton">
+                                            <i id="{{ todo.id }}" class="fa fa-plus-circle" aria-hidden="true"></i>
+                                        </button>
+                                        <div id="todo{{ todo.id }}" class="todoSubtitle">
+                                                <span><strong>Category: </strong> {{ todo.category }}</span>
+                                            {% if todo.dueness <= 1 %}
+                                                <span class="badge badge-danger">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 1 and todo.dueness <= 7 %}
+                                                <span class="badge badge-warning">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 7 and todo.dueness <= 14 %}
+                                                <span class="badge badge-success">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 14 %}
+                                                <span class="badge badge-primary">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                        </div>   
+                                        <div>
+                                            <button name="todoDelete" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                                <i class="fa fa-trash-o icon" value="{{ todo.id }}"></i>
+                                            </button>
+                                            <button name="startingTodo" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                                <i class="fa fa-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <br>
+                                {% endfor %}
+                            </ul><!-- todoList -->
+                        </div>
+                        <div class="col-sm">
+                            <h2>In Progress</h2>
+                            <ul class="todoList">
+                                {% for todo in inProgress %} <!-- django template lang - for loop -->
+                                    <div class="todoItem">            
+                                        <label for="{{ todo.id }}"><span><strong>Title: </strong>{{ todo.title }}</span></label>
+                                        <button id="{{ todo.id }}" type="button" class="expandButton">
+                                            <i id="{{ todo.id }}" class="fa fa-plus-circle" aria-hidden="true"></i>
+                                        </button>
+                                        <div id="todo{{ todo.id }}" class="todoSubtitle">
+                                                <span><strong>Category: </strong> {{ todo.category }}</span>
+                                            {% if todo.dueness <= 1 %}
+                                                <span class="badge badge-danger">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 1 and todo.dueness <= 7 %}
+                                                <span class="badge badge-warning">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 7 and todo.dueness <= 14 %}
+                                                <span class="badge badge-success">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 14 %}
+                                                <span class="badge badge-primary">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                        </div>   
+                                        <div>
+                                            <button name="didNotStart" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                                <i class="fa fa-arrow-left"></i>
+                                            </button>
+                                            <button name="todoDelete" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                                <i class="fa fa-trash-o icon" value="{{ todo.id }}"></i>
+                                            </button>
+                                            <button name="completed" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                                <i class="fa fa-arrow-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <br>
+                                {% endfor %}
+                            </ul><!-- todoList -->
+                        </div>
+                        <div class="col-sm">
+                            <h2>Completed</h2>
+                            <ul class="todoList">
+                                {% for todo in completed %} <!-- django template lang - for loop -->
+                                    <div class="todoItem">            
+                                        <label for="{{ todo.id }}"><span><strong>Title: </strong>{{ todo.title }}</span></label>
+                                        <button id="{{ todo.id }}" type="button" class="expandButton">
+                                            <i id="{{ todo.id }}" class="fa fa-plus-circle" aria-hidden="true"></i>
+                                        </button>
+                                        <div id="todo{{ todo.id }}" class="todoSubtitle">
+                                                <span><strong>Category: </strong> {{ todo.category }}</span>
+                                            {% if todo.dueness <= 1 %}
+                                                <span class="badge badge-danger">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 1 and todo.dueness <= 7 %}
+                                                <span class="badge badge-warning">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 7 and todo.dueness <= 14 %}
+                                                <span class="badge badge-success">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                            {% if todo.dueness > 14 %}
+                                                <span class="badge badge-primary">Due: {{ todo.due_date }}</span>
+                                            {% endif %}
+                                        </div>   
+                                        <div>
+                                            <button name="didNotComplete" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                                <i class="fa fa-arrow-left"></i>
+                                            </button>
+                                            <button name="todoDelete" value="{{ todo.id }}" formnovalidate="" type="submit">
+                                            <i class="fa fa-trash-o icon" value="{{ todo.id }}"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <br>
+                                {% endfor %}
+                            </ul><!-- todoList -->
+                        </div>
+                    </div>
+                </form>
+            </div><!-- content -->
+        </div><!-- container -->
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".expandButton").click(function(event){
+                var id = event.target.id;
+                console.log('expand todo id is', id);
+                $(`#todo${id}`).slideToggle("slow");
+            });
+            $(".expandAll").click(function(){
+                $(".todoSubtitle").slideToggle("slow");
+            });
+        });
+    </script>
+</body>
+</html>
