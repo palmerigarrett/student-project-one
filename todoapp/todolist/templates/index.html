@@ -95,12 +95,15 @@
                     </div>
                 {% endif %}
                 <br>
-                <div id="expandAllButton">
-                    <label for="expandAll"><span>Expand All</span></label>
-                    <button class="expandAll" type="button">
+                <div class="allButton">
+                    <button class="expandAll" type="button">Expand All 
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </button>
+                    <button class="collapseAll" type="button">Collapse All 
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     </button>
                 </div>
+                <br>
                 <form action="" method="post"> <!-- this form will send a post request to our django app -->
                     {% csrf_token %} <!-- csrf token for basic security -->
                     <div class="row">
@@ -232,7 +235,10 @@
                 $(`#todo${id}`).slideToggle("slow");
             });
             $(".expandAll").click(function(){
-                $(".todoSubtitle").slideToggle("slow");
+                $(".todoSubtitle:hidden").slideToggle("slow");
+            });
+            $(".collapseAll").click(function(){
+                $(".todoSubtitle:visible").slideToggle("slow");
             });
         });
     </script>
